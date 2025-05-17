@@ -1,5 +1,5 @@
 import { mnemonicToSeed } from "bip39";
-import  { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { HDNodeWallet, Wallet } from "ethers";
 import { ClipboardIcon } from "@heroicons/react/solid";
 
@@ -7,18 +7,17 @@ export const EthWallet = ({ mnemonic }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [addresses, setAddresses] = useState([]);
 
-  // Clear Wallets whenever mnemonic changes
-  useEffect(()=>{
+  useEffect(() => {
+    // Clear addresses if mnemonic changes
     setAddresses([]);
-    setCurrentIndex([0])
-  },[mnemonic])
-  // Function to copy address to clipboard
+    setCurrentIndex(0);
+  }, [mnemonic]);
+
   const copyToClipboard = (address) => {
     navigator.clipboard.writeText(address);
     alert("Address copied to clipboard!");
   };
 
-  // Function to clear all ETH wallets
   const clearAllWallets = () => {
     setAddresses([]);
     setCurrentIndex(0);
@@ -26,18 +25,13 @@ export const EthWallet = ({ mnemonic }) => {
 
   return (
     <div className="mt-6 p-4 bg-white rounded-lg shadow-md w-full max-w-lg mx-auto">
-      <h2 className="text-2xl font-semibold text-gray-700 text-center mb-4">
-        Ethereum Wallets
-      </h2>
+      <h2 className="text-2xl font-semibold text-gray-700 text-center mb-4">Ethereum Wallets</h2>
 
       <div className="flex justify-between mb-4">
         <button
           onClick={async function () {
-            if(!mnemonic)
-            {
-              alert("Please Generate a seed phrase first.")
-              return;
-            }
+            if (!mnemonic) return alert("Generate a seed phrase first.");
+
             const seed = await mnemonicToSeed(mnemonic);
             const derivationPath = `m/44'/60'/${currentIndex}'/0/0`;
             const hdNode = HDNodeWallet.fromSeed(seed);
@@ -65,9 +59,7 @@ export const EthWallet = ({ mnemonic }) => {
         ) : (
           addresses.map((address, index) => (
             <div key={index} className="bg-gray-100 p-3 rounded-lg shadow-sm flex items-center justify-between">
-              <div className="text-sm font-mono text-gray-700 truncate">
-                Eth - {address}
-              </div>
+              <div className="text-sm font-mono text-gray-700 truncate">Eth - {address}</div>
               <button
                 onClick={() => copyToClipboard(address)}
                 className="ml-2 text-blue-500 hover:text-blue-700"

@@ -1,28 +1,25 @@
+import { useState, useEffect } from "react";
 import { mnemonicToSeed } from "bip39";
-import  { useState } from "react";
 import { derivePath } from "ed25519-hd-key";
 import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import { ClipboardIcon } from "@heroicons/react/solid";
-import { useEffect } from "react";
 
 export const SolanaWallet = ({ mnemonic }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [publicKeys, setPublicKeys] = useState([]);
 
-  // Clear wallets whenever mnemonic changes
-  useEffect(()=>{
-    setPublicKeys([])
-    setCurrentIndex(0)
-  },[mnemonic])
+  // Clear wallets on mnemonic change
+  useEffect(() => {
+    setPublicKeys([]);
+    setCurrentIndex(0);
+  }, [mnemonic]);
 
-  // Function to copy address to clipboard
   const copyToClipboard = (address) => {
     navigator.clipboard.writeText(address);
     alert("Address copied to clipboard!");
   };
 
-  // Function to clear all Solana wallets
   const clearAllWallets = () => {
     setPublicKeys([]);
     setCurrentIndex(0);
@@ -37,10 +34,7 @@ export const SolanaWallet = ({ mnemonic }) => {
       <div className="flex justify-between mb-4">
         <button
           onClick={async function () {
-            if(!mnemonic) {
-              alert("Please generate a seed phrase first.");
-              return;
-            }
+            if (!mnemonic) return alert("Generate a seed phrase first.");
             const seed = await mnemonicToSeed(mnemonic);
             const path = `m/44'/501'/${currentIndex}'/0'`;
             const derivedSeed = derivePath(path, seed.toString("hex")).key;
@@ -54,7 +48,7 @@ export const SolanaWallet = ({ mnemonic }) => {
           + Add SOL Wallet
         </button>
 
-        <button 
+        <button
           onClick={clearAllWallets}
           className="ml-4 py-3 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 shadow-lg focus:outline-none"
         >
@@ -67,7 +61,10 @@ export const SolanaWallet = ({ mnemonic }) => {
           <p className="text-center text-gray-500">No wallets added yet.</p>
         ) : (
           publicKeys.map((p, index) => (
-            <div key={index} className="bg-gray-100 p-3 rounded-lg shadow-sm flex items-center justify-between">
+            <div
+              key={index}
+              className="bg-gray-100 p-3 rounded-lg shadow-sm flex items-center justify-between"
+            >
               <div className="text-sm font-mono text-gray-700 truncate">
                 Sol - {p}
               </div>
