@@ -1,13 +1,20 @@
 import { mnemonicToSeed } from "bip39";
-import React, { useState } from "react";
+import  { useState } from "react";
 import { derivePath } from "ed25519-hd-key";
 import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import { ClipboardIcon } from "@heroicons/react/solid";
+import { useEffect } from "react";
 
 export const SolanaWallet = ({ mnemonic }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [publicKeys, setPublicKeys] = useState([]);
+
+  // Clear wallets whenever mnemonic changes
+  useEffect(()=>{
+    setPublicKeys([])
+    setCurrentIndex(0)
+  },[mnemonic])
 
   // Function to copy address to clipboard
   const copyToClipboard = (address) => {
@@ -30,6 +37,10 @@ export const SolanaWallet = ({ mnemonic }) => {
       <div className="flex justify-between mb-4">
         <button
           onClick={async function () {
+            if(!mnemonic) {
+              alert("Please generate a seed phrase first.");
+              return;
+            }
             const seed = await mnemonicToSeed(mnemonic);
             const path = `m/44'/501'/${currentIndex}'/0'`;
             const derivedSeed = derivePath(path, seed.toString("hex")).key;

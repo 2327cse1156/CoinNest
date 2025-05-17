@@ -1,5 +1,5 @@
 import { mnemonicToSeed } from "bip39";
-import React, { useState } from "react";
+import  { useState,useEffect } from "react";
 import { HDNodeWallet, Wallet } from "ethers";
 import { ClipboardIcon } from "@heroicons/react/solid";
 
@@ -7,6 +7,11 @@ export const EthWallet = ({ mnemonic }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [addresses, setAddresses] = useState([]);
 
+  // Clear Wallets whenever mnemonic changes
+  useEffect(()=>{
+    setAddresses([]);
+    setCurrentIndex([0])
+  },[mnemonic])
   // Function to copy address to clipboard
   const copyToClipboard = (address) => {
     navigator.clipboard.writeText(address);
@@ -28,6 +33,11 @@ export const EthWallet = ({ mnemonic }) => {
       <div className="flex justify-between mb-4">
         <button
           onClick={async function () {
+            if(!mnemonic)
+            {
+              alert("Please Generate a seed phrase first.")
+              return;
+            }
             const seed = await mnemonicToSeed(mnemonic);
             const derivationPath = `m/44'/60'/${currentIndex}'/0/0`;
             const hdNode = HDNodeWallet.fromSeed(seed);
